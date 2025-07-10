@@ -2,6 +2,8 @@ package com.myproject.expense_tracker.model;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDate;
+
 @Entity
 public class Income {
 
@@ -16,7 +18,7 @@ public class Income {
     private double amount;
     private String currency;
     private String source;
-    private String date;
+    private LocalDate date;
 
     public Long getIncomeId() {
         return incomeId;
@@ -58,12 +60,11 @@ public class Income {
         this.source = source;
     }
 
-    public String getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(String date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
-
 }

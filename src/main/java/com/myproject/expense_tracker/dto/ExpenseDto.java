@@ -1,5 +1,7 @@
 package com.myproject.expense_tracker.dto;
 
+import java.time.LocalDate;
+
 public class ExpenseDto {
 
     private Long expenseId;
@@ -8,7 +10,8 @@ public class ExpenseDto {
     private double amount;
     private String currency;
     private String category;
-    private String date;
+    private LocalDate date;
+    private String receiptKey;
 
     public Long getExpenseId() {
         return expenseId;
@@ -58,11 +61,19 @@ public class ExpenseDto {
         this.category = category;
     }
 
-    public String getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(String date) {
+    public void setDate(LocalDate date) {
         this.date = date;
+    }
+
+    public String getReceiptKey() {
+        return receiptKey;
+    }
+
+    public void setReceiptKey(String receiptKey) {
+        this.receiptKey = receiptKey;
     }
 }

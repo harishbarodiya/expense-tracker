@@ -2,6 +2,8 @@ package com.myproject.expense_tracker.dto;
 
 import com.myproject.expense_tracker.model.User;
 
+import java.time.LocalDate;
+
 public class IncomeDto {
 
     private Long incomeId;
@@ -10,16 +12,8 @@ public class IncomeDto {
     private double amount;
     private String currency;
     private String source;
-    private String date;
+    private LocalDate date;
 
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
 
     public Long getIncomeId() {
         return incomeId;
@@ -35,6 +29,14 @@ public class IncomeDto {
 
     public void setUserId(Long userId) {
         this.userId = userId;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
     public double getAmount() {
@@ -61,11 +63,11 @@ public class IncomeDto {
         this.source = source;
     }
 
-    public String getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(String date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 }

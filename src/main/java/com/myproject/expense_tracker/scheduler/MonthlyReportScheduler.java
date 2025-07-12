@@ -6,6 +6,8 @@ import com.myproject.expense_tracker.service.*;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.TextStyle;
 import java.util.List;
@@ -18,34 +20,53 @@ public class MonthlyReportScheduler {
     private final UserService userService;
     private final EmailService emailService;
     private final ReportService reportService;
+    private final ChartService chartService;
+    private final EmailTemplateService emailTemplateService;
 
 
-    public MonthlyReportScheduler(UserService userService, EmailService emailService, ReportService reportService) {
+    public MonthlyReportScheduler(UserService userService, EmailService emailService, ReportService reportService, ChartService chartService, EmailTemplateService emailTemplateService) {
         this.userService = userService;
         this.emailService = emailService;
         this.reportService = reportService;
+        this.chartService = chartService;
+        this.emailTemplateService = emailTemplateService;
     }
 
 //    @Scheduled(cron = "0 0 10 1 * ?") // Every 1st of month at 10:00 AM
     @Scheduled(cron = "0 */2 * * * *") // Every 2 minutes
-    public void sendMonthlyReports() {
+    public void sendMonthlyReports() throws IOException {
         String month = LocalDate.now().minusMonths(1).getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
         List<User> users = userService.findAllUsers();
         for (User user : users) {
             Map<String, Double> monthlySummary = reportService.getMonthlySummary(user.getUsername());
             Map<String, Double> categorySummary = reportService.getMonthlyCategorySummary(user.getUsername());
 
-            String report = generatePlainTextReport(user.getFullName(),
-                    month,
-                    monthlySummary,
-                    categorySummary
-            );
+//            Plain text email
+//            String report = generatePlainTextReport(user.getFullName(),
+//                    month,
+//                    monthlySummary,
+//                    categorySummary
+//            );
 
-            emailService.sendSimpleEmail(
+//            emailService.sendSimpleEmail(
+//                    user.getEmail(),
+//                    "Your " + month + " Expense Report",
+//                    report
+//            );
+
+
+//            HTML email report with chart
+            File chartFile = chartService.generateCategoryPieChart(categorySummary);
+            String htmlBody = emailTemplateService.buildHtmlReport(user.getFullName(),
+                    month,
+                    monthlySummary);
+            emailService.sendHtmlEmailWithChart(
                     user.getEmail(),
                     "Your " + month + " Expense Report",
-                    report
+                    htmlBody,
+                    chartFile
             );
+            break;
         }
     }
     private String generatePlainTextReport(

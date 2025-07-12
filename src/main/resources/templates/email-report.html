@@ -1,0 +1,18 @@
+<html>
+<body style="font-family: Arial, sans-serif;">
+<h2>Hello <span th:text="${fullName}">User</span>,</h2>
+
+<p>📊 Here is your summary for <b th:text="${month}">Month</b>:</p>
+
+<ul>
+    <li>Total Income: ₹<span th:text="${income}">0.0</span></li>
+    <li>Total Expenses: ₹<span th:text="${expenses}">0.0</span></li>
+    <li>Savings: ₹<span th:text="${savings}">0.0</span></li>
+</ul>
+
+<p><strong>Expense Breakdown:</strong></p>
+<img src="cid:categoryChart" alt="Category Pie Chart" style="max-width: 100%; height: auto;" />
+
+<p>Thanks for using <b>Expense Tracker</b>!</p>
+</body>
+</html>

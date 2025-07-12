@@ -73,4 +73,8 @@ public class UserService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
         userRepository.delete(user);
     }
+
+    public List<User> findAllUsers(){
+        return userRepository.findAll();
+    }
 }

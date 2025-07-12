@@ -81,4 +81,34 @@ public class ReportService {
 
         return trendList;
     }
+    public Map<String, Double> getLastMonthSummary(String username){
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        LocalDate startDate = LocalDate.now().minusMonths(1).withDayOfMonth(1);
+        LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
+        double totalIncome = incomeRepository.sumByUserAndDateBetween(user, startDate, endDate).orElse(0.0);
+        double totalExpense = expenseRepository.sumByUserAndDateBetween(user, startDate, endDate).orElse(0.0);
+        double savings = totalIncome - totalExpense;
+
+        return Map.of(
+                "totalIncome", totalIncome,
+                "totalExpense", totalExpense,
+                "savings", savings
+        );
+    }
+
+    public Map<String, Double> getMonthlyCategorySummary(String username){
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        List<Object[]> results = expenseRepository.sumByCategory(user);
+
+        Map<String, Double> summary = new HashMap<>();
+        for (Object[] result : results) {
+            summary.put((String) result[0], (Double) result[1]);
+        }
+
+        return summary;
+    }
+
 }

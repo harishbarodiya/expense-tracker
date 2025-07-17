@@ -3,13 +3,18 @@ package com.myproject.expense_tracker.service;
 import com.myproject.expense_tracker.dto.IncomeDto;
 import com.myproject.expense_tracker.dto.UserDto;
 import com.myproject.expense_tracker.dto.UserResponseDto;
+import com.myproject.expense_tracker.enums.ErrorCode;
 import com.myproject.expense_tracker.enums.Role;
 import com.myproject.expense_tracker.mapper.UserMapper;
 import com.myproject.expense_tracker.model.Income;
 import com.myproject.expense_tracker.model.User;
 import com.myproject.expense_tracker.repository.IncomeRepository;
 import com.myproject.expense_tracker.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -24,6 +29,8 @@ import java.util.stream.Collectors;
 @Service
 public class UserService implements UserDetailsService {
 
+    private static Logger logger = LoggerFactory.getLogger(UserService.class);
+
     @Autowired
     private UserRepository userRepository;
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
@@ -37,21 +44,23 @@ public class UserService implements UserDetailsService {
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
         user.setRole(Role.USER);
         userRepository.save(user);
+        logger.info("User registered in database successfully!");
     }
 
     public User authenticateUser(String username, String rawPassword){
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND.getMessage()));
         if(!passwordEncoder.matches(rawPassword, user.getPassword())){
-            throw new RuntimeException("Invalid credentials");
+            throw new BadCredentialsException(ErrorCode.UNAUTHORIZED_ACCESS.getMessage());
         }
+        logger.info("Authentication success!");
         return user;
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-
+    public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
+        User user = userRepository.findByUsername(userName)
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND.getMessage()));
+        logger.info("User loaded {}!", userName);
         return org.springframework.security.core.userdetails.User.builder()
                 .username(user.getUsername())
                 .password(user.getPassword())
@@ -62,7 +71,7 @@ public class UserService implements UserDetailsService {
 //  admin only
     public List<UserResponseDto> getAllUsers(){
         List<User> users = userRepository.findAll();
-        System.out.println(">>>>>>>>>>>>>>>>>"+users.size());
+        logger.info("{} users fetched from database successfully!", users.size());
         return users.stream()
                 .map(userMapper::toUserResponseDto)
                 .collect(Collectors.toList());
@@ -70,8 +79,9 @@ public class UserService implements UserDetailsService {
 
     public void deleteUser(String userName){
         User user = userRepository.findByUsername(userName)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND.getMessage()));
         userRepository.delete(user);
+        logger.info("User {} deleted successfully!",userName);
     }
 
     public List<User> findAllUsers(){

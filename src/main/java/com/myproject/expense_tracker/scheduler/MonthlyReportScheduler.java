@@ -3,6 +3,7 @@ package com.myproject.expense_tracker.scheduler;
 import com.myproject.expense_tracker.model.User;
 import com.myproject.expense_tracker.repository.ExpenseRepository;
 import com.myproject.expense_tracker.service.*;
+import jakarta.mail.MessagingException;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -34,11 +35,11 @@ public class MonthlyReportScheduler {
 
 //    @Scheduled(cron = "0 0 10 1 * ?") // Every 1st of month at 10:00 AM
 //    @Scheduled(cron = "0 */2 * * * *") // Every 2 minutes
-    public void sendMonthlyReports() throws IOException {
+    public void sendMonthlyReports() throws IOException, MessagingException {
         String month = LocalDate.now().minusMonths(1).getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
         List<User> users = userService.findAllUsers();
         for (User user : users) {
-            Map<String, Double> monthlySummary = reportService.getMonthlySummary(user.getUsername());
+            Map<String, Double> monthlySummary = reportService.getLastMonthSummary(user.getUsername());
             Map<String, Double> categorySummary = reportService.getMonthlyCategorySummary(user.getUsername());
 
 //            Plain text email

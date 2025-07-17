@@ -2,6 +2,8 @@ package com.myproject.expense_tracker.service;
 
 import com.myproject.expense_tracker.model.Expense;
 import com.myproject.expense_tracker.repository.ExpenseRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -26,6 +28,8 @@ import java.util.UUID;
 @Service
 public class S3Service {
 
+    private static Logger logger = LoggerFactory.getLogger(S3Service.class);
+
     private final S3Client s3Client;
     private final ExpenseRepository expenseRepository;
 
@@ -47,7 +51,7 @@ public class S3Service {
                 .build();
 
         s3Client.putObject(putObjectRequest, RequestBody.fromBytes(file.getBytes()));
-
+        logger.info("File uploaded to S3 bucket!");
         return key;
     }
 
@@ -56,7 +60,7 @@ public class S3Service {
                         .bucket(bucketName)
                         .key(receiptKey)
                         .build());
-
+        logger.info("File downloaded from S3 bucket!");
         return new InputStreamResource(s3Object);
     }
 }

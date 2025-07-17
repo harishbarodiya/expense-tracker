@@ -82,7 +82,9 @@ public class ReceiptOcrService {
         }
 
 
-        Pattern datePattern = Pattern.compile("(?i)(Dated|Date)[:\\s]*([0-9]{1,2}[-\\s]?(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*[-\\s]?[0-9]{4})", Pattern.CASE_INSENSITIVE);
+//        Pattern datePattern = Pattern.compile("(?i)(Dated|Date)[:\\s]*([0-9]{1,2}[-\\s]?(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*[-\\s]?[0-9]{4})", Pattern.CASE_INSENSITIVE);
+//        Pattern datePattern = Pattern.compile("(?i)(Dated|Date)[:\\s]*([0-9]{1,2}[./\\-\\s]?(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)?[a-z]*[./\\-\\s]?[0-9]{4})", Pattern.CASE_INSENSITIVE);
+        Pattern datePattern = Pattern.compile("(?i)(Dated|Date)[:\\s]*([0-9]{1,2}[./\\-\\s]?[A-Za-z]{3,9}[./\\-\\s]?[0-9]{4}|[0-9]{2}[./\\-][0-9]{2}[./\\-][0-9]{4})");
         Matcher m2 = datePattern.matcher(rawText);
         LocalDate date = null;
 

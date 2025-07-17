@@ -4,6 +4,7 @@ import com.myproject.expense_tracker.dto.ExpenseDto;
 import com.myproject.expense_tracker.model.Expense;
 import com.myproject.expense_tracker.repository.ExpenseRepository;
 import com.myproject.expense_tracker.service.ExpenseService;
+import com.myproject.expense_tracker.service.ReceiptOcrService;
 import com.myproject.expense_tracker.service.S3Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
@@ -29,6 +30,7 @@ public class ExpenseController {
     @Autowired private ExpenseService expenseService;
     @Autowired private S3Service s3Service;
     @Autowired private ExpenseRepository expenseRepository;
+    @Autowired private ReceiptOcrService receiptOcrService;
 
     @PostMapping("/add-expense")
     public ResponseEntity<String> addExpense(@RequestBody ExpenseDto expenseDto){
@@ -73,5 +75,14 @@ public class ExpenseController {
                 .body(new InputStreamResource(inputStreamResource));
     }
 
+
+    @PostMapping("/upload-ocr")
+    public ResponseEntity<?> uploadAndExtractExpense(@RequestParam("file") MultipartFile file){
+        try{
+            return ResponseEntity.ok(receiptOcrService.parseReceiptAndFetchData(file));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + e.getMessage());
+        }
+    }
 }
 

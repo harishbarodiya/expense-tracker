@@ -33,7 +33,7 @@ public class MonthlyReportScheduler {
     }
 
 //    @Scheduled(cron = "0 0 10 1 * ?") // Every 1st of month at 10:00 AM
-    @Scheduled(cron = "0 */2 * * * *") // Every 2 minutes
+//    @Scheduled(cron = "0 */2 * * * *") // Every 2 minutes
     public void sendMonthlyReports() throws IOException {
         String month = LocalDate.now().minusMonths(1).getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
         List<User> users = userService.findAllUsers();

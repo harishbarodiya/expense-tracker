@@ -38,6 +38,8 @@ public class UserService implements UserDetailsService {
 
     public void registerUser(SignUpRequestDto signUpRequest){
         User user = new User();
+        user.setFullName(signUpRequest.getFullName());
+        user.setEmail(signUpRequest.getEmail());
         user.setUsername(signUpRequest.getUsername());
         user.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
         user.setRole(Role.USER);

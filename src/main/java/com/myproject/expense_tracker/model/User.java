@@ -2,6 +2,7 @@ package com.myproject.expense_tracker.model;
 
 import com.myproject.expense_tracker.enums.Role;
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
 public class User {
@@ -18,6 +19,9 @@ public class User {
 
     private String username;
     private String password;
+
+    @CreationTimestamp
+    @Column(updatable = false)
     private String createTime;
 
     public Long getUserId() {

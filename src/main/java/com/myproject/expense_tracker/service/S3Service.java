@@ -41,7 +41,7 @@ public class S3Service {
         this.expenseRepository = expenseRepository;
     }
 
-    public String uploadreceipt(MultipartFile file) throws IOException{
+    public String uploadReceiptToS3(MultipartFile file) throws IOException{
 
         String key = "expense-receipts/" + UUID.randomUUID() + "_" + file.getOriginalFilename();
        PutObjectRequest putObjectRequest = PutObjectRequest.builder()
@@ -56,11 +56,11 @@ public class S3Service {
     }
 
     public InputStreamResource downloadReceipt(String receiptKey){
+        logger.info("Downloading from S3 bucket!");
         ResponseInputStream<GetObjectResponse> s3Object = s3Client.getObject(GetObjectRequest.builder()
                         .bucket(bucketName)
                         .key(receiptKey)
                         .build());
-        logger.info("File downloaded from S3 bucket!");
         return new InputStreamResource(s3Object);
     }
 }

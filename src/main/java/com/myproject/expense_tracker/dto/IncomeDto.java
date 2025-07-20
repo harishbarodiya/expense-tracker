@@ -1,6 +1,9 @@
 package com.myproject.expense_tracker.dto;
 
 import com.myproject.expense_tracker.model.User;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 
 import java.time.LocalDate;
 
@@ -9,11 +12,18 @@ public class IncomeDto {
     private Long incomeId;
     private Long userId;
     private String fullName;
-    private double amount;
-    private String currency;
-    private String source;
-    private LocalDate date;
 
+    @NotNull(message = "Amount is required")
+    @Positive(message = "Amount must be greater than zero")
+    private Double amount;
+
+    @NotBlank(message = "Currency is required")
+    private String currency;
+
+    @NotBlank(message = "Source is required")
+    private String source;
+
+    private LocalDate date;
 
     public Long getIncomeId() {
         return incomeId;
@@ -39,11 +49,11 @@ public class IncomeDto {
         this.fullName = fullName;
     }
 
-    public double getAmount() {
+    public Double getAmount() {
         return amount;
     }
 
-    public void setAmount(double amount) {
+    public void setAmount(Double amount) {
         this.amount = amount;
     }
 

@@ -8,6 +8,12 @@ import com.myproject.expense_tracker.repository.ExpenseRepository;
 import com.myproject.expense_tracker.service.ExpenseService;
 import com.myproject.expense_tracker.service.ReceiptOcrService;
 import com.myproject.expense_tracker.service.S3Service;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.SchemaProperty;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +45,7 @@ public class ExpenseController {
     @Autowired private ReceiptOcrService receiptOcrService;
 
     @PostMapping("/add-expense")
-    public ResponseEntity<ApiResponseDto<String>> addExpense(@RequestBody ExpenseDto expenseDto){
+    public ResponseEntity<ApiResponseDto<String>> addExpense(@Valid @RequestBody ExpenseDto expenseDto){
         logger.info("Adding a new expense.");
         expenseService.addExpense(expenseDto);
         return ResponseEntity.status(HttpStatus.OK).body(
@@ -64,36 +70,8 @@ public class ExpenseController {
                 )
         );
     }
-
-    @PostMapping("/upload-receipt/{expenseId}")
-    public ResponseEntity<ApiResponseDto<String>> uploadReceipt(@PathVariable Long expenseId,
-                                                @RequestParam("file") MultipartFile file) {
-        try{
-            String s3Key = s3Service.uploadreceipt(file);
-            expenseService.attachReceipt(expenseId, s3Key);
-            return ResponseEntity.status(HttpStatus.OK).body(
-                    new ApiResponseDto<>(ApiStatus.SUCCESS,
-                            HttpStatus.OK.value(),
-                            ApiStatus.SUCCESS.name(),
-                            LocalDateTime.now(),
-                            s3Key
-                    )
-            );
-        } catch (IOException e){
-            logger.error("File upload get failed due to following error:" + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                    new ApiResponseDto<>(ApiStatus.FAILED,
-                            HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                            ApiStatus.FAILED.name(),
-                            LocalDateTime.now(),
-                            "Upload failed!"
-                    )
-            );
-        }
-    }
-
     @GetMapping("/download-receipt/{expenseId}")
-    public ResponseEntity<ApiResponseDto<InputStreamResource>> downloadReceipt(@PathVariable Long expenseId) {
+    public ResponseEntity<InputStreamResource> downloadReceipt(@PathVariable Long expenseId) {
        logger.info("Downloading receipt.");
         Map.Entry<String, InputStreamResource> entry = expenseService.downloadReceipt(expenseId);
         String receiptKey = entry.getKey();
@@ -102,16 +80,12 @@ public class ExpenseController {
         return ResponseEntity.status(HttpStatus.OK)
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\""+ receiptKey + "\"")
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .body(new ApiResponseDto<>(ApiStatus.SUCCESS,
-                        HttpStatus.OK.value(),
-                        ApiStatus.SUCCESS.name(),
-                        LocalDateTime.now(),
-                        new InputStreamResource(inputStreamResource)
-                )
-        );
+                .body(new InputStreamResource(inputStreamResource)
+                );
     }
 
-    @PostMapping("/upload-ocr")
+    @PostMapping(value = "/upload-ocr", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ApiResponse(responseCode = "200", description = "File uploaded successfully")
     public ResponseEntity<ApiResponseDto<?>> uploadAndExtractExpense(@RequestParam("file") MultipartFile file){
         logger.info("Uploading receipt for OCR.");
         try{
@@ -131,6 +105,33 @@ public class ExpenseController {
                             ApiStatus.FAILED.name(),
                             LocalDateTime.now(),
                             "Error: " + e.getMessage()
+                    )
+            );
+        }
+    }
+
+    @PostMapping(value = "/upload-receipt", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ApiResponse(responseCode = "200", description = "File uploaded successfully")
+    public ResponseEntity<ApiResponseDto<String>> uploadReceipt(@RequestParam("expenseId") Long expenseId,
+                                                                @RequestParam("file") MultipartFile file) {
+        try{
+            expenseService.uploadAndAttachReceipt(expenseId, file);
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new ApiResponseDto<>(ApiStatus.SUCCESS,
+                            HttpStatus.OK.value(),
+                            ApiStatus.SUCCESS.name(),
+                            LocalDateTime.now(),
+                            "Upload success!"
+                    )
+            );
+        } catch (IOException e){
+            logger.error("File upload get failed due to following error:" + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                    new ApiResponseDto<>(ApiStatus.FAILED,
+                            HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                            ApiStatus.FAILED.name(),
+                            LocalDateTime.now(),
+                            "Upload failed!"
                     )
             );
         }

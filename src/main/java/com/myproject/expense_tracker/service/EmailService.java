@@ -27,16 +27,6 @@ public class EmailService {
         this.mailSender = mailSender;
     }
 
-//    public void sendSimpleEmail(String to, String subject, String body){
-//        SimpleMailMessage message = new SimpleMailMessage();
-//        message.setFrom(mailFrom);
-//        message.setTo(to);
-//        message.setSubject(subject);
-//        message.setText(body);
-//        mailSender.send(message);
-//        System.out.println("Email sent!");
-//    }
-
     public void sendHtmlEmailWithChart(String to, String subject, String htmlBody, File chartFile) throws MessagingException {
         try {
             MimeMessage message = mailSender.createMimeMessage();

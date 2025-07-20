@@ -5,6 +5,7 @@ import com.myproject.expense_tracker.dto.IncomeDto;
 import com.myproject.expense_tracker.enums.ApiStatus;
 import com.myproject.expense_tracker.model.Income;
 import com.myproject.expense_tracker.service.IncomeService;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +25,7 @@ public class IncomeController {
     private IncomeService incomeService;
 
     @PostMapping("/add-income")
-    public ResponseEntity<ApiResponseDto<String>> addIncome(@RequestBody IncomeDto incomeDto){
+    public ResponseEntity<ApiResponseDto<String>> addIncome(@Valid @RequestBody IncomeDto incomeDto){
         logger.info("Adding a new income.");
         incomeService.addIncome(incomeDto);
         return ResponseEntity.status(HttpStatus.OK).body(

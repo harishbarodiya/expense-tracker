@@ -15,7 +15,7 @@ public class Expense {
     @JoinColumn(name = "user_id")
     private User user;
 
-    private double amount;
+    private Double amount;
     private String currency;
     private String category;
     private LocalDate date;
@@ -37,11 +37,11 @@ public class Expense {
         this.user = user;
     }
 
-    public double getAmount() {
+    public Double getAmount() {
         return amount;
     }
 
-    public void setAmount(double amount) {
+    public void setAmount(Double amount) {
         this.amount = amount;
     }
 
@@ -77,3 +77,4 @@ public class Expense {
         this.receiptKey = receiptKey;
     }
 }
+

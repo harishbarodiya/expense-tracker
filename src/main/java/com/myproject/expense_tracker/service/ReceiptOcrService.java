@@ -28,6 +28,7 @@ public class ReceiptOcrService {
 
     @Autowired
     public ReceiptOcrService(TextractClient textractClient) {
+
         this.textractClient = textractClient;
     }
 

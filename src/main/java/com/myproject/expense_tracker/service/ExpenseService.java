@@ -17,10 +17,12 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.S3Object;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -81,7 +83,7 @@ public class ExpenseService {
                 .collect(Collectors.toList());
     }
 
-    public void attachReceipt(Long expenseId, String s3Key) {
+    public void uploadAndAttachReceipt(Long expenseId, MultipartFile file) throws IOException {
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String userName = auth.getName();
@@ -89,10 +91,11 @@ public class ExpenseService {
         Expense expense = expenseRepository.findByExpenseIdAndUser_Username(expenseId, userName)
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.EXPENSE_NOT_FOUND.getMessage()));
 
-        expense.setReceiptKey(s3Key);
+        String s3Key = s3Service.uploadReceiptToS3(file);
 
+        expense.setReceiptKey(s3Key);
         expenseRepository.save(expense);
-        logger.info("Expense receipt has been attached to {}",expenseId);
+        logger.info("Expense receipt has been uploaded and attached to expense-id {}",expenseId);
     }
 
     public Map.Entry<String, InputStreamResource> downloadReceipt(Long expenseId) {
@@ -102,6 +105,7 @@ public class ExpenseService {
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.EXPENSE_NOT_FOUND.getMessage()));
 
         String receiptKey = expense.getReceiptKey();
+        logger.info("Receipt key fetched from expense");
         InputStreamResource inputStreamResource = s3Service.downloadReceipt(receiptKey);
         logger.info("Receipt fetched from S3");
         return Map.entry(receiptKey, inputStreamResource);

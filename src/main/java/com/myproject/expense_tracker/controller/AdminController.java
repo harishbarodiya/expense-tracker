@@ -18,6 +18,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/admin")
+@PreAuthorize("hasRole('ADMIN')")
 public class AdminController {
 
     private static final Logger logger = LoggerFactory.getLogger(AdminController.class);
@@ -42,7 +43,6 @@ public class AdminController {
         );
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/delete-user/{username}")
     public ResponseEntity<ApiResponseDto<String>> deleteUser(@PathVariable String username) {
         logger.info("Deleting user {}", username);

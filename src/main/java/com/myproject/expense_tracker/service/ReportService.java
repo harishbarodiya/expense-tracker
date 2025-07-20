@@ -82,7 +82,7 @@ public class ReportService {
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND.getMessage()));
         List<Map<String, Object>> trendList = new ArrayList<>();
 
-        for (int i = 5; i >= 0; i--) {
+        for (int i = 6; i >= 1; i--) {
             YearMonth ym = YearMonth.now().minusMonths(i);
             LocalDate start = ym.atDay(1);
             LocalDate end = ym.atEndOfMonth();

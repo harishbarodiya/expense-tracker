@@ -1,19 +1,17 @@
 package com.myproject.expense_tracker.service;
 
-import com.myproject.expense_tracker.dto.IncomeDto;
-import com.myproject.expense_tracker.dto.UserDto;
+import com.myproject.expense_tracker.dto.SignUpRequestDto;
 import com.myproject.expense_tracker.dto.UserResponseDto;
 import com.myproject.expense_tracker.enums.ErrorCode;
 import com.myproject.expense_tracker.enums.Role;
 import com.myproject.expense_tracker.mapper.UserMapper;
-import com.myproject.expense_tracker.model.Income;
 import com.myproject.expense_tracker.model.User;
-import com.myproject.expense_tracker.repository.IncomeRepository;
 import com.myproject.expense_tracker.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -38,10 +36,10 @@ public class UserService implements UserDetailsService {
     @Autowired
     private UserMapper userMapper;
 
-    public void registerUser(UserDto userDto){
+    public void registerUser(SignUpRequestDto signUpRequest){
         User user = new User();
-        user.setUsername(userDto.getUsername());
-        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+        user.setUsername(signUpRequest.getUsername());
+        user.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
         user.setRole(Role.USER);
         userRepository.save(user);
         logger.info("User registered in database successfully!");
@@ -80,8 +78,14 @@ public class UserService implements UserDetailsService {
     public void deleteUser(String userName){
         User user = userRepository.findByUsername(userName)
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.USER_NOT_FOUND.getMessage()));
-        userRepository.delete(user);
-        logger.info("User {} deleted successfully!",userName);
+        if(user.getRole().equals(Role.USER)) {
+            userRepository.delete(user);
+            logger.info("User {} deleted successfully!",userName);
+        }
+        else {
+            logger.error("User id given does not belongs to a USER role");
+            throw new AccessDeniedException(ErrorCode.ADMIN_DELETE_ADMIN.getMessage());
+        }
     }
 
     public List<User> findAllUsers(){

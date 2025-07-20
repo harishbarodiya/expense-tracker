@@ -1,5 +1,9 @@
 package com.myproject.expense_tracker.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+
 import java.time.LocalDate;
 
 public class ExpenseDto {
@@ -7,9 +11,17 @@ public class ExpenseDto {
     private Long expenseId;
     private Long userId;
     private String fullName;
-    private double amount;
+
+    @NotNull(message = "Amount is required")
+    @Positive(message = "Amount must be greater than zero")
+    private Double amount;
+
+    @NotBlank(message = "Currency is required")
     private String currency;
+
+    @NotBlank(message = "Category is required")
     private String category;
+
     private LocalDate date;
     private String receiptKey;
 
@@ -37,11 +49,11 @@ public class ExpenseDto {
         this.fullName = fullName;
     }
 
-    public double getAmount() {
+    public Double getAmount() {
         return amount;
     }
 
-    public void setAmount(double amount) {
+    public void setAmount(Double amount) {
         this.amount = amount;
     }
 

@@ -1,11 +1,13 @@
 package com.myproject.expense_tracker.controller;
 
 import com.myproject.expense_tracker.dto.ApiResponseDto;
-import com.myproject.expense_tracker.dto.UserDto;
+import com.myproject.expense_tracker.dto.LoginRequestDto;
+import com.myproject.expense_tracker.dto.SignUpRequestDto;
 import com.myproject.expense_tracker.enums.ApiStatus;
 import com.myproject.expense_tracker.model.User;
 import com.myproject.expense_tracker.service.UserService;
 import com.myproject.expense_tracker.utils.JwtUtil;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,9 +29,9 @@ public class AuthController {
     @Autowired private JwtUtil jwtUtil;
 
     @PostMapping("/signup")
-    public ResponseEntity<ApiResponseDto<String>> register(@RequestBody UserDto userDto){
+    public ResponseEntity<ApiResponseDto<String>> register(@Valid @RequestBody SignUpRequestDto signUpRequest){
         logger.info("Registering new user.");
-        userService.registerUser(userDto);
+        userService.registerUser(signUpRequest);
         return ResponseEntity.status(HttpStatus.OK).body(
                 new ApiResponseDto<>(ApiStatus.SUCCESS,
                         HttpStatus.OK.value(),
@@ -41,7 +43,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<ApiResponseDto<String>> login(@RequestBody User loginRequest){
+    public ResponseEntity<ApiResponseDto<String>> login(@Valid @RequestBody LoginRequestDto loginRequest){
         logger.info("Logging-in a user.");
         User user = userService.authenticateUser(loginRequest.getUsername(), loginRequest.getPassword());
         String token = jwtUtil.generateToken(user);

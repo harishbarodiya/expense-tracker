@@ -6,7 +6,8 @@ public enum ErrorCode {
     USER_NOT_FOUND("User not found."),
     UNAUTHORIZED_ACCESS("Unauthorized access."),
     EMAIL_SENDING_FAILED("Failed to send email."),
-    ADMIN_DELETE_ADMIN("Admins cannot delete other admins.");
+    ADMIN_DELETE_ADMIN("Admins cannot delete other admins."),
+    UNSUPPORTED_FILE_FORMAT("Unsupported file format.");
 
     private final String message;
 

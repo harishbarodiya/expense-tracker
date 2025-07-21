@@ -3,15 +3,11 @@ package com.myproject.expense_tracker.controller;
 import com.myproject.expense_tracker.dto.ApiResponseDto;
 import com.myproject.expense_tracker.dto.ExpenseDto;
 import com.myproject.expense_tracker.enums.ApiStatus;
-import com.myproject.expense_tracker.model.Expense;
 import com.myproject.expense_tracker.repository.ExpenseRepository;
+import com.myproject.expense_tracker.service.AnalyzeReceiptService;
 import com.myproject.expense_tracker.service.ExpenseService;
 import com.myproject.expense_tracker.service.ReceiptOcrService;
 import com.myproject.expense_tracker.service.S3Service;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.media.SchemaProperty;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -22,14 +18,10 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +35,7 @@ public class ExpenseController {
     @Autowired private S3Service s3Service;
     @Autowired private ExpenseRepository expenseRepository;
     @Autowired private ReceiptOcrService receiptOcrService;
+    @Autowired private AnalyzeReceiptService analyzeReceiptService;
 
     @PostMapping("/add-expense")
     public ResponseEntity<ApiResponseDto<String>> addExpense(@Valid @RequestBody ExpenseDto expenseDto){
@@ -84,17 +77,18 @@ public class ExpenseController {
                 );
     }
 
-    @PostMapping(value = "/upload-ocr", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+
+    @PostMapping(value = "/analyze-receipt", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ApiResponse(responseCode = "200", description = "File uploaded successfully")
-    public ResponseEntity<ApiResponseDto<?>> uploadAndExtractExpense(@RequestParam("file") MultipartFile file){
-        logger.info("Uploading receipt for OCR.");
+    public ResponseEntity<ApiResponseDto<?>> uploadAndAnalyzeReceipt(@RequestParam("file") MultipartFile file){
+        logger.info("Uploading receipt for analyzing.");
         try{
             return ResponseEntity.status(HttpStatus.OK).body(
                     new ApiResponseDto<>(ApiStatus.SUCCESS,
                             HttpStatus.OK.value(),
                             ApiStatus.SUCCESS.name(),
                             LocalDateTime.now(),
-                            receiptOcrService.parseReceiptAndFetchData(file)
+                            analyzeReceiptService.analyzeExpenseReceipt(file)
                     )
             );
         } catch (Exception e) {
@@ -136,5 +130,36 @@ public class ExpenseController {
             );
         }
     }
+
+
+
+//
+//    @PostMapping(value = "/upload-ocr", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+//    @ApiResponse(responseCode = "200", description = "File uploaded successfully")
+//    public ResponseEntity<ApiResponseDto<?>> uploadAndExtractExpense(@RequestParam("file") MultipartFile file){
+//        logger.info("Uploading receipt for OCR.");
+//        try{
+//            return ResponseEntity.status(HttpStatus.OK).body(
+//                    new ApiResponseDto<>(ApiStatus.SUCCESS,
+//                            HttpStatus.OK.value(),
+//                            ApiStatus.SUCCESS.name(),
+//                            LocalDateTime.now(),
+//                            receiptOcrService.parseReceiptAndFetchData(file)
+//                    )
+//            );
+//        } catch (Exception e) {
+//            logger.error("Exception caugth: "+e.getMessage());
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+//                    new ApiResponseDto<>(ApiStatus.FAILED,
+//                            HttpStatus.INTERNAL_SERVER_ERROR.value(),
+//                            ApiStatus.FAILED.name(),
+//                            LocalDateTime.now(),
+//                            "Error: " + e.getMessage()
+//                    )
+//            );
+//        }
+//    }
+
+
 }
 

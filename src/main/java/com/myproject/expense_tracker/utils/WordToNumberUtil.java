@@ -23,7 +23,9 @@ public class WordToNumberUtil {
                 .replaceAll("rs\\.?\\s*", "")   // remove "Rs." or "Rs "
                 .replaceAll("only", "")         // remove "only"
                 .replaceAll("[^a-z\\s-]", "")   // remove symbols, dots, numbers
+                .replaceAll("-", " ")
                 .trim();
+
         System.out.println("Input       "+input);
         String[] words = input.split("\\s+");
         int total = 0;

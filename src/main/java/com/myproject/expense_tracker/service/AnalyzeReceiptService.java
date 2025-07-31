@@ -92,11 +92,13 @@ public class AnalyzeReceiptService {
                 "dd MMMM yyyy",
                 "M/d/yyyy",
                 "M-d-yyyy",
-                "d-MMM-yyyy"
+                "d-MMM-yyyy",
+                "dd.MM.yyyy",
+                "MM.dd.yyyy"
         );
 
         for (String pattern : patterns) {
-            try {System.out.println(pattern);
+            try {
                 return LocalDate.parse(dateStr, DateTimeFormatter.ofPattern(pattern));
             } catch (Exception ignored) {}
         }

@@ -82,11 +82,12 @@ Swagger UI will be available at:
 
 | Endpoint | Method | Description |
 |---------|--------|-------------|
-| `/api/auth/register` | POST | Register a new user |
+| `/api/auth/signup` | POST | Register a new user |
 | `/api/auth/login` | POST | Login and get JWT |
 | `/api/expenses` | GET/POST/PUT/DELETE | Expense CRUD |
-| `/api/receipts/upload` | POST | Upload a receipt |
-| `/api/receipts/download/{id}` | GET | Download receipt by ID |
+| `/api/receipts/analyze-receipt` | POST | Analyze and parse a receipt |
+| `/api/expense/upload-receipt` | POST | Upload a receipt |
+| `/api/expense/download/{expenseId}` | GET | Download receipt by ID |
 
 ---
 

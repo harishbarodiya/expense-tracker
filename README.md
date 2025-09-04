@@ -7,7 +7,7 @@ This is a full-stack **Expense Tracker** backend project built with **Spring Boo
 
 ## 📦 Features
 
-- 📋 **Add / Update / Delete Expenses**
+- 📋 **Add / Update / Delete Incomes & Expenses**
 - 📊 **Monthly Expense Summary Reports**
 - 🧾 **Upload and Store Receipt Images** (AWS S3)
 - 📥 **Download Receipts Anytime**

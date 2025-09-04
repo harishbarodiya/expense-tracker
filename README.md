@@ -85,7 +85,7 @@ Swagger UI will be available at:
 | `/api/auth/signup` | POST | Register a new user |
 | `/api/auth/login` | POST | Login and get JWT |
 | `/api/expenses` | GET/POST/PUT/DELETE | Expense CRUD |
-| `/api/receipts/analyze-receipt` | POST | Analyze and parse a receipt |
+| `/api/expense/analyze-receipt` | POST | Analyze and parse a receipt |
 | `/api/expense/upload-receipt` | POST | Upload a receipt |
 | `/api/expense/download/{expenseId}` | GET | Download receipt by ID |
 
